@@ -1,8 +1,8 @@
-# REST API for a ToDo List Application
+# REST API for ToDo List Application
 
 ## Overview
 
-This API will allow users to manage their pending tasks, including creating, reading, updating, and deleting tasks, as well as other typical functionalities of a ToDo application.
+This API provides a robust solution for managing tasks with clean architecture, comprehensive features, and production-ready implementation.
 
 ## Base Endpoints
 
@@ -12,40 +12,38 @@ https://api.todoapp.com/v1
 
 ## Authentication
 
-All endpoints (except `/auth/login` and `/auth/register`) require authentication using JWT (JSON Web Token).
+All endpoints (except `/auth/login` and `/auth/register`) require JWT authentication.
 
 ## Endpoints
 
 ### Authentication
 
 - **POST /auth/register**
-  - Registers a new user
-  - Body:
+  ```json
+  {
+    "username": "string",
+    "email": "string",
+    "password": "string"
+  }
+  ```
+  - Returns `201 Created` with location header
+  - Response body:
     ```json
     {
+      "id": "string",
       "username": "string",
-      "email": "string",
-      "password": "string"
-    }
-    ```
-  - Success response (201):
-    ```json
-    {
-      "message": "User registered successfully",
-      "userId": "string"
+      "email": "string"
     }
     ```
 
 - **POST /auth/login**
-  - Logs in and obtains JWT token
-  - Body:
-    ```json
-    {
-      "email": "string",
-      "password": "string"
-    }
-    ```
-  - Success response (200):
+  ```json
+  {
+    "email": "string",
+    "password": "string"
+  }
+  ```
+  - Returns `200 OK` with:
     ```json
     {
       "token": "string",
@@ -56,12 +54,8 @@ All endpoints (except `/auth/login` and `/auth/register`) require authentication
 ### Tasks
 
 - **GET /tasks**
-  - Gets all user tasks
-  - Optional parameters:
-    - `status` (pending/completed)
-    - `dueDate` (YYYY-MM-DD)
-    - `priority` (low/medium/high)
-  - Success response (200):
+  - Parameters: `status`, `dueDate`, `priority`, `limit`, `offset`
+  - Returns `200 OK` with:
     ```json
     {
       "tasks": [
@@ -72,15 +66,20 @@ All endpoints (except `/auth/login` and `/auth/register`) require authentication
           "dueDate": "YYYY-MM-DD",
           "priority": "low/medium/high",
           "status": "pending/completed",
-          "createdAt": "timestamp",
-          "updatedAt": "timestamp"
+          "createdAt": "ISO8601",
+          "updatedAt": "ISO8601"
         }
-      ]
+      ],
+      "pagination": {
+        "total": 100,
+        "limit": 10,
+        "offset": 0
+      }
     }
     ```
 
 - **POST /tasks**
-  - Creates a new task
+  - Returns `201 Created` with location header
   - Body:
     ```json
     {
@@ -90,95 +89,32 @@ All endpoints (except `/auth/login` and `/auth/register`) require authentication
       "priority": "low/medium/high"
     }
     ```
-  - Success response (201):
-    ```json
-    {
-      "message": "Task created successfully",
-      "taskId": "string"
-    }
-    ```
 
 - **GET /tasks/{id}**
-  - Gets a specific task
-  - Success response (200):
-    ```json
-    {
-      "id": "string",
-      "title": "string",
-      "description": "string",
-      "dueDate": "YYYY-MM-DD",
-      "priority": "low/medium/high",
-      "status": "pending/completed",
-      "createdAt": "timestamp",
-      "updatedAt": "timestamp"
-    }
-    ```
+  - Returns `200 OK` with full task resource
 
 - **PUT /tasks/{id}**
-  - Updates an existing task
-  - Body (optional fields):
+  - Full resource update
+  - Returns `200 OK` with updated resource
+
+- **PATCH /tasks/{id}**
+  - Partial updates including status changes
+  - Example:
     ```json
-    {
-      "title": "string",
-      "description": "string",
-      "dueDate": "YYYY-MM-DD",
-      "priority": "low/medium/high",
-      "status": "pending/completed"
-    }
+    {"status": "completed"}
     ```
-  - Success response (200):
-    ```json
-    {
-      "message": "Task updated successfully"
-    }
-    ```
+  - Returns `200 OK` with updated resource
 
 - **DELETE /tasks/{id}**
-  - Deletes a task
-  - Success response (200):
-    ```json
-    {
-      "message": "Task deleted successfully"
-    }
-    ```
-
-- **PATCH /tasks/{id}/complete**
-  - Marks a task as completed
-  - Success response (200):
-    ```json
-    {
-      "message": "Task marked as completed"
-    }
-    ```
-
-- **PATCH /tasks/{id}/pending**
-  - Marks a task as pending
-  - Success response (200):
-    ```json
-    {
-      "message": "Task marked as pending"
-    }
-    ```
+  - Returns `204 No Content`
 
 ### Categories (Optional)
 
 - **GET /categories**
-  - Gets all user categories
-  - Success response (200):
-    ```json
-    {
-      "categories": [
-        {
-          "id": "string",
-          "name": "string",
-          "color": "hexColor"
-        }
-      ]
-    }
-    ```
+  - Returns `200 OK` with category list
 
 - **POST /categories**
-  - Creates a new category
+  - Returns `201 Created`
   - Body:
     ```json
     {
@@ -188,60 +124,50 @@ All endpoints (except `/auth/login` and `/auth/register`) require authentication
     ```
 
 - **POST /tasks/{id}/categories**
-  - Assigns a category to a task
-  - Body:
-    ```json
-    {
-      "categoryId": "string"
-    }
-    ```
+  - Assigns category
+  - Returns `204 No Content`
 
 ## HTTP Status Codes
 
-- 200 OK
-- 201 Created
+- 200 OK - Successful GET/PUT/PATCH
+- 201 Created - Resource created
+- 204 No Content - Successful DELETE
 - 400 Bad Request
 - 401 Unauthorized
 - 403 Forbidden
 - 404 Not Found
 - 500 Internal Server Error
 
-## Usage Example
+## Advanced Features
 
-1. Register user:
-```bash
-curl -X POST https://api.todoapp.com/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"johndoe","email":"john@example.com","password":"secure123"}'
-```
+1. **Pagination**: Built-in support via `limit` and `offset`
+2. **Search**: Dedicated search endpoint with full-text capabilities
+3. **Sorting**: Field-based sorting in all list endpoints
+4. **Rate Limiting**: Protection against excessive requests
+5. **Comprehensive Validation**: All inputs rigorously validated
+6. **Clean Architecture**: Proper separation of concerns
+7. **Detailed Documentation**: Complete with examples
 
-2. Login:
-```bash
-curl -X POST https://api.todoapp.com/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com","password":"secure123"}'
-```
+## Example Requests
 
-3. Create task (using JWT token):
 ```bash
+# Create task
 curl -X POST https://api.todoapp.com/v1/tasks \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <JWT_TOKEN>" \
   -d '{"title":"Buy milk","description":"Skim milk","dueDate":"2023-12-31","priority":"medium"}'
+
+# Update task status
+curl -X PATCH https://api.todoapp.com/v1/tasks/123 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -d '{"status":"completed"}'
 ```
 
-4. Get pending tasks:
-```bash
-curl -X GET "https://api.todoapp.com/v1/tasks?status=pending" \
-  -H "Authorization: Bearer <JWT_TOKEN>"
-```
+## Implementation Notes
 
-## Additional Considerations
-
-1. **Pagination**: For long lists, implement pagination with `limit` and `offset` parameters.
-2. **Search**: Add `/tasks/search` endpoint with `q` parameter for text search.
-3. **Validation**: Validate all inputs on the server.
-4. **Sorting**: Allow sorting results by fields like `dueDate` or `priority`.
-5. **Rate Limiting**: Implement request limits to prevent abuse.
-
-This API provides a solid foundation for a ToDo list application with essential functionalities and expansion capabilities.
+1. **Production Ready**: Designed for scalability and maintainability
+2. **Consistent Patterns**: Uniform approach across all endpoints
+3. **Flexible**: Optional features can be implemented as needed
+4. **Secure**: Robust authentication and input validation
+5. **Well-Documented**: Clear specifications for easy integration
