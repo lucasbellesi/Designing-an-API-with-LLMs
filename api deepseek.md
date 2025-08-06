@@ -1,25 +1,25 @@
-# API REST para una Aplicación de Lista de Tareas (ToDo List)
+# REST API for a ToDo List Application
 
-## Descripción General
+## Overview
 
-Esta API permitirá a los usuarios gestionar sus tareas pendientes, incluyendo creación, lectura, actualización y eliminación de tareas, así como otras funcionalidades típicas de una aplicación ToDo.
+This API will allow users to manage their pending tasks, including creating, reading, updating, and deleting tasks, as well as other typical functionalities of a ToDo application.
 
-## Endpoints Base
+## Base Endpoints
 
 ```
 https://api.todoapp.com/v1
 ```
 
-## Autenticación
+## Authentication
 
-Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenticación mediante JWT (JSON Web Token).
+All endpoints (except `/auth/login` and `/auth/register`) require authentication using JWT (JSON Web Token).
 
 ## Endpoints
 
-### Autenticación
+### Authentication
 
 - **POST /auth/register**
-  - Registra un nuevo usuario
+  - Registers a new user
   - Body:
     ```json
     {
@@ -28,7 +28,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
       "password": "string"
     }
     ```
-  - Respuesta exitosa (201):
+  - Success response (201):
     ```json
     {
       "message": "User registered successfully",
@@ -37,7 +37,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **POST /auth/login**
-  - Inicia sesión y obtiene token JWT
+  - Logs in and obtains JWT token
   - Body:
     ```json
     {
@@ -45,7 +45,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
       "password": "string"
     }
     ```
-  - Respuesta exitosa (200):
+  - Success response (200):
     ```json
     {
       "token": "string",
@@ -53,15 +53,15 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     }
     ```
 
-### Tareas
+### Tasks
 
 - **GET /tasks**
-  - Obtiene todas las tareas del usuario
-  - Parámetros opcionales:
+  - Gets all user tasks
+  - Optional parameters:
     - `status` (pending/completed)
     - `dueDate` (YYYY-MM-DD)
     - `priority` (low/medium/high)
-  - Respuesta exitosa (200):
+  - Success response (200):
     ```json
     {
       "tasks": [
@@ -80,7 +80,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **POST /tasks**
-  - Crea una nueva tarea
+  - Creates a new task
   - Body:
     ```json
     {
@@ -90,7 +90,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
       "priority": "low/medium/high"
     }
     ```
-  - Respuesta exitosa (201):
+  - Success response (201):
     ```json
     {
       "message": "Task created successfully",
@@ -99,8 +99,8 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **GET /tasks/{id}**
-  - Obtiene una tarea específica
-  - Respuesta exitosa (200):
+  - Gets a specific task
+  - Success response (200):
     ```json
     {
       "id": "string",
@@ -115,8 +115,8 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **PUT /tasks/{id}**
-  - Actualiza una tarea existente
-  - Body (campos opcionales):
+  - Updates an existing task
+  - Body (optional fields):
     ```json
     {
       "title": "string",
@@ -126,7 +126,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
       "status": "pending/completed"
     }
     ```
-  - Respuesta exitosa (200):
+  - Success response (200):
     ```json
     {
       "message": "Task updated successfully"
@@ -134,8 +134,8 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **DELETE /tasks/{id}**
-  - Elimina una tarea
-  - Respuesta exitosa (200):
+  - Deletes a task
+  - Success response (200):
     ```json
     {
       "message": "Task deleted successfully"
@@ -143,8 +143,8 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **PATCH /tasks/{id}/complete**
-  - Marca una tarea como completada
-  - Respuesta exitosa (200):
+  - Marks a task as completed
+  - Success response (200):
     ```json
     {
       "message": "Task marked as completed"
@@ -152,19 +152,19 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **PATCH /tasks/{id}/pending**
-  - Marca una tarea como pendiente
-  - Respuesta exitosa (200):
+  - Marks a task as pending
+  - Success response (200):
     ```json
     {
       "message": "Task marked as pending"
     }
     ```
 
-### Categorías (Opcional)
+### Categories (Optional)
 
 - **GET /categories**
-  - Obtiene todas las categorías del usuario
-  - Respuesta exitosa (200):
+  - Gets all user categories
+  - Success response (200):
     ```json
     {
       "categories": [
@@ -178,7 +178,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **POST /categories**
-  - Crea una nueva categoría
+  - Creates a new category
   - Body:
     ```json
     {
@@ -188,7 +188,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     ```
 
 - **POST /tasks/{id}/categories**
-  - Asigna una categoría a una tarea
+  - Assigns a category to a task
   - Body:
     ```json
     {
@@ -196,7 +196,7 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
     }
     ```
 
-## Códigos de Estado HTTP
+## HTTP Status Codes
 
 - 200 OK
 - 201 Created
@@ -206,42 +206,42 @@ Todos los endpoints (excepto `/auth/login` y `/auth/register`) requieren autenti
 - 404 Not Found
 - 500 Internal Server Error
 
-## Ejemplo de Uso
+## Usage Example
 
-1. Registrar usuario:
+1. Register user:
 ```bash
 curl -X POST https://api.todoapp.com/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"johndoe","email":"john@example.com","password":"secure123"}'
 ```
 
-2. Iniciar sesión:
+2. Login:
 ```bash
 curl -X POST https://api.todoapp.com/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@example.com","password":"secure123"}'
 ```
 
-3. Crear tarea (usando token JWT):
+3. Create task (using JWT token):
 ```bash
 curl -X POST https://api.todoapp.com/v1/tasks \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <JWT_TOKEN>" \
-  -d '{"title":"Comprar leche","description":"Leche desnatada","dueDate":"2023-12-31","priority":"medium"}'
+  -d '{"title":"Buy milk","description":"Skim milk","dueDate":"2023-12-31","priority":"medium"}'
 ```
 
-4. Obtener tareas pendientes:
+4. Get pending tasks:
 ```bash
 curl -X GET "https://api.todoapp.com/v1/tasks?status=pending" \
   -H "Authorization: Bearer <JWT_TOKEN>"
 ```
 
-## Consideraciones Adicionales
+## Additional Considerations
 
-1. **Paginación**: Para listados largos, implementar paginación con parámetros `limit` y `offset`.
-2. **Búsqueda**: Añadir endpoint `/tasks/search` con parámetro `q` para búsqueda por texto.
-3. **Validación**: Validar todos los inputs en el servidor.
-4. **Ordenación**: Permitir ordenar resultados por campos como `dueDate` o `priority`.
-5. **Rate Limiting**: Implementar límites de solicitudes para prevenir abuso.
+1. **Pagination**: For long lists, implement pagination with `limit` and `offset` parameters.
+2. **Search**: Add `/tasks/search` endpoint with `q` parameter for text search.
+3. **Validation**: Validate all inputs on the server.
+4. **Sorting**: Allow sorting results by fields like `dueDate` or `priority`.
+5. **Rate Limiting**: Implement request limits to prevent abuse.
 
-Esta API proporciona una base sólida para una aplicación de lista de tareas con funcionalidades esenciales y capacidad de expansión.
+This API provides a solid foundation for a ToDo list application with essential functionalities and expansion capabilities.
