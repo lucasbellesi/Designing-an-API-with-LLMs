@@ -1,89 +1,78 @@
-# Diseño de API REST para una app web de ToDo List
+# REST API Design for a ToDo List Web App
 
-## Descripción general
+## Overview
 
-Esta API REST permite gestionar tareas (ToDo) para una aplicación web. Está pensada para ser usada desde un frontend desacoplado y puede ser implementada en distintos lenguajes y frameworks backend, siguiendo principios de arquitectura limpia y diseño basado en dominios.
-
----
-
-## Funcionalidades principales
-
-* Crear nuevas tareas
-* Listar todas las tareas
-* Editar tareas
-* Eliminar tareas
-* Marcar tareas como completadas o incompletas
-* Agrupar tareas (por usuario, categoría, fecha, etc.)
+This REST API allows the management of tasks (ToDos) for a web application. It is designed to work with a decoupled frontend and to be implemented in any backend stack, following Clean Architecture and Domain-Driven Design (DDD) principles.
 
 ---
 
-## Tecnologías sugeridas
+## Core Features
 
-| Componente    | Alternativas sugeridas                        |
-| ------------- | --------------------------------------------- |
-| Backend       | Node.js + Express, Go + Gin, Python + FastAPI |
-| Base de datos | SQLite                                        |
-| Autenticación | JWT (si es multiusuario)                      |
-
----
-
-## Modelo de datos (`Task`)
-
-```json
-{
-  "id": "uuid",
-  "title": "string",
-  "description": "string",
-  "completed": false,
-  "dueDate": "2025-08-10T18:00:00Z",
-  "createdAt": "2025-08-05T20:00:00Z",
-  "updatedAt": "2025-08-05T20:00:00Z"
-}
-```
-
-Si la app es multiusuario:
-
-```json
-"userId": "uuid"
-```
+* Create new tasks
+* List all tasks
+* Edit tasks
+* Delete tasks
+* Mark tasks as completed or not completed
+* Group tasks (by user, category, date, etc.)
 
 ---
 
-## Endpoints REST
+## Suggested Technologies
 
-### GET `/tasks`
-
-**Descripción:** Obtener todas las tareas.
-**Respuesta exitosa (200):**
-
-```json
-[
-  {
-    "id": "uuid",
-    "title": "string",
-    "description": "string",
-    "completed": false,
-    "dueDate": "ISODate",
-    "createdAt": "ISODate",
-    "updatedAt": "ISODate"
-  }
-]
-```
+| Component      | Alternatives                                                    |
+| -------------- | --------------------------------------------------------------- |
+| Backend        | Any modern framework (e.g., Express, FastAPI, Gin, Spring Boot) |
+| Database       | SQLite                                                          |
+| Authentication | JWT (optional, for multi-user support)                          |
 
 ---
 
-### GET `/tasks/{id}`
+## Domain Model: `Task`
 
-**Descripción:** Obtener una tarea por ID.
-**Respuesta exitosa (200):** Objeto `Task`
-**Errores posibles:** `404 Not Found`
+A task is the core aggregate root in the domain.
+
+### Attributes
+
+| Field       | Type     | Description                       |
+| ----------- | -------- | --------------------------------- |
+| id          | UUID     | Unique identifier                 |
+| title       | String   | Short title of the task           |
+| description | String   | Detailed description              |
+| completed   | Boolean  | Whether the task is completed     |
+| dueDate     | DateTime | Optional deadline                 |
+| createdAt   | DateTime | Creation timestamp                |
+| updatedAt   | DateTime | Last modification timestamp       |
+| userId\*    | UUID     | Owner of the task (if multi-user) |
+
+> \*Optional, only used in multi-user systems.
 
 ---
 
-### POST `/tasks`
+## REST Endpoints
 
-**Descripción:** Crear una nueva tarea.
-**Body esperado:**
+### `GET /tasks`
+
+**Description:** Retrieve a list of all tasks.
+**Response:**
+
+* `200 OK`: Array of `Task` objects
+
+---
+
+### `GET /tasks/{id}`
+
+**Description:** Retrieve a task by its ID.
+**Response:**
+
+* `200 OK`: `Task` object
+* `404 Not Found`: If the task does not exist
+
+---
+
+### `POST /tasks`
+
+**Description:** Create a new task.
+**Request Body:**
 
 ```json
 {
@@ -93,22 +82,26 @@ Si la app es multiusuario:
 }
 ```
 
-**Respuesta exitosa (201):** Objeto `Task` creado
+**Response:**
+
+* `201 Created`: Newly created `Task` object
 
 ---
 
-### PUT `/tasks/{id}`
+### `PUT /tasks/{id}`
 
-**Descripción:** Reemplazar completamente una tarea.
-**Body esperado:** Objeto `Task` completo
-**Respuesta:** `200 OK` con el objeto actualizado
+**Description:** Replace a task entirely.
+**Request Body:** Full `Task` object
+**Response:**
+
+* `200 OK`: Updated `Task` object
 
 ---
 
-### PATCH `/tasks/{id}`
+### `PATCH /tasks/{id}`
 
-**Descripción:** Actualizar parcialmente una tarea (por ejemplo, cambiar estado de completado).
-**Body parcial:**
+**Description:** Partially update a task (e.g., toggle completion).
+**Request Body:**
 
 ```json
 {
@@ -116,25 +109,27 @@ Si la app es multiusuario:
 }
 ```
 
-**Respuesta:** `200 OK` con la tarea modificada
+**Response:**
+
+* `200 OK`: Updated `Task` object
 
 ---
 
-### DELETE `/tasks/{id}`
+### `DELETE /tasks/{id}`
 
-**Descripción:** Eliminar una tarea.
-**Respuesta exitosa:** `204 No Content`
-**Errores posibles:** `404 Not Found`
+**Description:** Delete a task.
+**Response:**
+
+* `204 No Content`: Successfully deleted
+* `404 Not Found`: If the task does not exist
 
 ---
 
-## Autenticación (opcional)
+## Authentication (Optional)
 
-Si la aplicación requiere autenticación multiusuario, se sugiere implementar un flujo JWT:
+### `POST /auth/register`
 
-### POST `/auth/register`
-
-**Body esperado:**
+**Request Body:**
 
 ```json
 {
@@ -143,9 +138,9 @@ Si la aplicación requiere autenticación multiusuario, se sugiere implementar u
 }
 ```
 
-### POST `/auth/login`
+### `POST /auth/login`
 
-**Body esperado:**
+**Request Body:**
 
 ```json
 {
@@ -154,7 +149,7 @@ Si la aplicación requiere autenticación multiusuario, se sugiere implementar u
 }
 ```
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -162,7 +157,7 @@ Si la aplicación requiere autenticación multiusuario, se sugiere implementar u
 }
 ```
 
-Luego se requiere el uso del token en cada request protegida:
+**Authorization header for protected requests:**
 
 ```http
 Authorization: Bearer <jwt-token>
@@ -170,21 +165,23 @@ Authorization: Bearer <jwt-token>
 
 ---
 
-## Ejemplos de uso
+## Usage Examples
 
-### Crear tarea (`POST /tasks`)
+### Create a task
 
 ```json
+POST /tasks
 {
-  "title": "Estudiar Probabilidad",
-  "description": "Repasar ejercicios de la guía",
+  "title": "Study Probability",
+  "description": "Review exercises from the guide",
   "dueDate": "2025-08-06T22:00:00Z"
 }
 ```
 
-### Marcar como completada (`PATCH /tasks/{id}`)
+### Mark task as completed
 
 ```json
+PATCH /tasks/{id}
 {
   "completed": true
 }
@@ -192,38 +189,34 @@ Authorization: Bearer <jwt-token>
 
 ---
 
-## Estructura de proyecto sugerida (Clean Architecture)
+## Suggested Project Structure (Domain-Oriented, Technology-Agnostic)
 
 ```
 /app/
 │
 ├── /domain/
-│   ├── entities/
-│   │   └── task.go / task.ts
-│   ├── repositories/
-│   │   └── task_repository.go / .ts
-│   └── services/
-│       └── task_service.go / .ts
+│   ├── /entities/         # Core business entities (e.g., Task)
+│   ├── /value_objects/    # Reusable typed objects (e.g., Email, DateRange)
+│   ├── /repositories/     # Interfaces for persistence abstraction
+│   └── /services/         # Domain services (pure business logic)
+│
+├── /application/
+│   ├── /use_cases/        # Application-level services (e.g., CreateTask)
+│   └── /dto/              # Input/output data transfer objects
 │
 ├── /infrastructure/
-│   ├── /persistence/
-│   │   └── sqlite_task_repository.go / .ts
-│   └── /auth/
-│       └── jwt_auth_service.go / .ts
+│   ├── /persistence/      # Implementations of repository interfaces (e.g., SQLite)
+│   └── /auth/             # JWT handling, password hashing
 │
 ├── /interfaces/
 │   ├── /http/
-│   │   ├── controllers/
-│   │   │   └── task_controller.go / .ts
-│   │   └── routes/
-│   │       └── task_routes.go / .ts
-│   └── /middleware/
-│       └── auth_middleware.go / .ts
+│   │   ├── /controllers/  # Route handlers for HTTP requests
+│   │   └── /routes/       # Route declarations
+│   └── /middleware/       # Auth, error handling, logging
 │
-├── /config/
-│   └── database.go / .ts
+├── /config/               # App configuration, database setup
 │
-└── main.go / index.ts
+└── /main/                 # Entry point (e.g., server startup)
 ```
 
-> Esta estructura permite portar fácilmente el dominio y la lógica de negocio a diferentes frameworks o lenguajes sin reescribir la app desde cero.
+> This structure cleanly separates concerns and allows reuse of domain logic across different interfaces (e.g., CLI, HTTP, gRPC).
