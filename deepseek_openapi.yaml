@@ -24,8 +24,6 @@ tags:
     description: Task management operations
   - name: Categories
     description: Task categorization
-  - name: Statistics
-    description: Productivity insights
 
 components:
   schemas:
@@ -168,6 +166,66 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  parameters:
+    taskIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Task identifier
+
+    statusParam:
+      name: status
+      in: query
+      schema:
+        type: string
+        enum: [pending, completed]
+      description: Filter by task status
+
+    priorityParam:
+      name: priority
+      in: query
+      schema:
+        type: string
+        enum: [low, medium, high]
+      description: Filter by priority level
+
+    limitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Number of items per page
+
+    offsetParam:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Pagination offset
+
+  responses:
+    UnauthorizedError:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 
 paths:
   /auth/register:
@@ -403,64 +461,3 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-components:
-  parameters:
-    taskIdParam:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: Task identifier
-
-    statusParam:
-      name: status
-      in: query
-      schema:
-        type: string
-        enum: [pending, completed]
-      description: Filter by task status
-
-    priorityParam:
-      name: priority
-      in: query
-      schema:
-        type: string
-        enum: [low, medium, high]
-      description: Filter by priority level
-
-    limitParam:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-      description: Number of items per page
-
-    offsetParam:
-      name: offset
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: Pagination offset
-
-  responses:
-    UnauthorizedError:
-      description: Missing or invalid authentication
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-    NotFoundError:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
